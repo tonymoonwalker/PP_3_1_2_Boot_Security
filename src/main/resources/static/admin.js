@@ -163,34 +163,10 @@ $(document).ready(function () {
 })
 
 $("#createUserButton").click(function () {
-    createUser().then(() => {
-        clearForm().then(() => {
-            getAllUsers().catch(error => {
-                console.error();
-            })
-        })
-    })
+    createUser()
+        .then(() => clearForm())
+        .then(() => getAllUsers())
+        .catch(error => {
+            console.error(error);
+        });
 });
-
-
-function attemptAddUserMessage(result, error) {
-    if (result === 'success') {
-        $("#messageAfterAddingAttempt").modal('show')
-        $("#messageAfterAddingAttempt div.modal-header").addClass("bg-success");
-        $("#messageAfterAddingAttempt div.modal-header h5.modal-title").text("Success!");
-        $("#messageAfterAddingAttempt div.modal-body p").text("User has been successfully added to data base.");
-    }
-
-    if (result == 'fail') {
-        $("#messageAfterAddingAttempt").modal('show')
-        $("#messageAfterAddingAttempt div.modal-header").addClass("bg-danger");
-        $("#messageAfterAddingAttempt div.modal-header h5.modal-title").text("Attention!");
-        $("#messageAfterAddingAttempt div.modal-body p").text(error);
-    }
-
-    $("#messageAfterAddingAttemptBackButton").click(function () {
-        getAllUsers().then(function () {
-            location.href = "/admin";
-        })
-    });
-}
