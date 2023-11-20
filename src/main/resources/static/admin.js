@@ -1,5 +1,11 @@
 const url = 'http://localhost:8080/restAdmin';
+$(document).ready(function () {
+    getAllUsers().then(() => {
 
+    }).catch(error => {
+        console.error(error);
+    });
+})
 async function getAllUsers() {
     await new Promise(resolve => setTimeout(resolve, 200));
     try {
@@ -120,7 +126,41 @@ async function deleteUser(id) {
 
 }
 
+async function editUser() {
+    let thisRoles = [];
+    $("#userRoles option").each(function () {
+        if ($(this).prop('selected')) {
+            thisRoles.push({
+                id: $(this).val()
+            })
+        }
+    });
+
+    let user = {
+        id: $("#userId").val(),
+        username: $("#userName").val(),
+        firstName: $("#userFirstName").val(),
+        lastName: $("#userLastName").val(),
+        email: $("#userEmail").val(),
+        roles: thisRoles
+    }
+
+    try {
+        await fetch(url + "/edit-user", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8"
+            },
+            body: JSON.stringify(user)
+        });
+        $("#userManager").modal('hide');
+        await getAllUsers();
+    } catch (error) {
+        console.error(error);
+    }
+}
 async function createUser() {
+
     let userRoles = []
     $("#newUserRoles option").each(
         function () {
@@ -145,28 +185,17 @@ async function createUser() {
             /*'Accept': 'application/json',*/
             'Content-Type': 'application/json; charset=UTF-8'
         },
-        body: JSON.stringify(user)
-    }).then(() => getAllUsers())
-}
-
-async function clearForm() {
-    $("#newUserTab form input.form-control").val("");
-    $("newUserTab form select option").prop('selected', false);
-}
-
-$(document).ready(function () {
-    getAllUsers().then(() => {
-
-    }).catch(error => {
-        console.error(error);
-    });
-})
-
-$("#createUserButton").click(function () {
-    createUser()
-        .then(() => clearForm())
+        body: JSON.stringify(user)})
         .then(() => getAllUsers())
+        .then(() => {
+            location.reload();
+        })
         .catch(error => {
             console.error(error);
-        });
-});
+        })
+}
+
+function clearForm() {
+    $("#newUserTab form input.form-control").text("");
+    $("#newUserTab form select").val([]);
+}
